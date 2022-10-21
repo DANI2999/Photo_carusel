@@ -1,107 +1,344 @@
-document.getElementById("outer3").addEventListener("click", toggleState3);
+console.clear();
+
+select = e => document.querySelector(e);
+selectAll = e => document.querySelectorAll(e);
+
+const stage = select('.stage');
+const hero = select('.hero');
+let gltl = gsap.timeline({ delay: 1 });
+let sparks = gsap.utils.toArray('.spark');
+let xDist = "100vw";
+let tapped = false;
+
+function animInCuboids() {
+    let tl = gsap.timeline( {
+        delay: 0
+    });
     
-function toggleState3() {
-  let galleryView = document.getElementById("galleryView")
-  let tilesView = document.getElementById("tilesView")
-  let outer = document.getElementById("outer3");
-  let slider = document.getElementById("slider3");
-  let tilesContainer = document.getElementById("tilesContainer");
-  if (slider.classList.contains("active")) {
-    slider.classList.remove("active");
-    outer.classList.remove("outerActive");
-    galleryView.style.display = "flex";
-    tilesView.style.display = "none";
+    tl.from('.hero__cuboid', {
+        rotateY: 270,
+        duration: 5,
+        ease: 'power4', 
+        stagger: 0.2,
+        transformOrigin: "center center"
+    }, 0)
+    .from('.hero__cuboid', {
+        // y: function(i) {
+        //     if(i%2 == 0) {
+        //         return "-50vh";
+        //     }
+        //     return "50vh";
+        // },
+        x: xDist,
+        duration: 4,
+        stagger: 0.4,
+        ease: 'power4'
+    }, 0)
+    .from('.hero__cuboid', {
+        rotationZ: 90,
+        stagger: 0.2,
+        duration: 6,
+        ease: 'power4'
+    }, 0)
+    .from('.hero', {
+        scale: 2.5,
+        duration: 9,
+        ease: 'power4',
+    }, 0)
+    .to('.face--right img', {
+        opacity: 0,
+        duration: 1.5,
+        ease: 'power4', 
+        stagger: 0.4
+    }, 0)
+    .to('.face--back img', {
+        opacity: 0,
+        duration: 5,
+        ease: 'power4', 
+        stagger: 0.4
+    }, 0)
+    .to('.face--left img', {
+        opacity: 0,
+        duration: 5,
+        ease: 'power4', 
+        stagger: 0.4,
+        onComplete: initEvents
+    }, 0.5)
+    .from('.face--front img', {
+        // x: "-25px", // doesn't work with object-fit
+        // css: { objectPosition: "50% 50%" }, // too janky
+        scale: 1.5,
+        transformOrigin: "right top",
+        duration: 9,
+        ease: 'power3.out', 
+        // stagger: 0.4
+    }, 1.5);
     
-    while (tilesContainer.hasChildNodes()) {
-      tilesContainer.removeChild(tilesContainer.firstChild)
-      }  
-  } else {
-    slider.classList.add("active");
-    outer.classList.add("outerActive");
-    galleryView.style.display = "none";
-    tilesView.style.display = "flex";
-     
-    for (let i = 0; i < imgObject.length - 1; i++) {
-      let tileItem = document.createElement("div");
-      tileItem.classList.add("tileItem");
-      tileItem.style.background =  "url(" + imgObject[i] + ")";
-      tileItem.style.backgroundSize = "contain";  
-      tilesContainer.appendChild(tileItem);      
-    }
-  };
+    return tl;
 }
 
-let imgObject = [
-  "https://placeimg.com/450/450/any",
-  "https://placeimg.com/450/450/animals",
-  "https://placeimg.com/450/450/architecture",
-  "https://placeimg.com/450/450/nature",
-  "https://placeimg.com/450/450/people",
-  "https://placeimg.com/450/450/tech",
-  "https://picsum.photos/id/1/450/450",
-  "https://picsum.photos/id/8/450/450",
-  "https://picsum.photos/id/12/450/450",
-  "https://picsum.photos/id/15/450/450",
-  "https://picsum.photos/id/5/450/450",
-];
+function animateLogo() {
+    
+    gsap.set(sparks, {
+        transformOrigin: 'center center',
+        scale: 0.25,
+        opacity: 0
+    })
+    
+    tl = gsap.timeline();
+    tl.from('.disney', {
+        opacity: 0,
+        ease: 'none',
+        duration: 2
+    })
+    .fromTo('.mask-arc', {
+        drawSVG: "100% 100%",
+        
+    }, {
+        drawSVG: "100%",
+        duration: 1,
+        ease: 'power2.in'
+    }, 0.5)
+    .from('.glow', {
+        scale: 0,
+        duration: 0.7,
+        ease: 'sine.in'
+    }, 0.5)
+    .from('.glow', {
+        motionPath: {
+            path: ".glow-path",
+            align: ".glow-path",
+            alignOrigin: [0.5, 0.5],
+            autoRotate: true
+        },
+        duration: 1,
+        ease: 'power2.in'
+    }, 0.5)
+    .set('.glow', {
+        opacity: 0
+    }, "-=0.5")
+    .from('.plus', {
+        scale: 0,
+        duration: 0.7,
+        ease: 'elastic(1, 0.7)',
+        transformOrigin: "center center"
+    }, "-=0.55")
+    .fromTo('.plus-glow', {
+        scale: 0,
+        transformOrigin: "center center",
+    },{
+        scale: 3.0,
+        opacity: 1,
+        ease: 'sine.inOut',
+        duration: 0.1
+    }, "-=0.70")
+    .to('.plus-glow', {
+        // scale: 0,
+        opacity: 0,
+        duration: 1.3,
+        ease: 'power2'
+    }, "-=0.7")
+    
+    return tl;
+}
 
-let mainImg = 0;
-let prevImg = imgObject.length - 1;
-let nextImg = 1;
+function sparkle() {
+    
+    stl = gsap.timeline();
+    
+    sparks.forEach((target, i ) => {
 
-function loadGallery() {
+        let tl = gsap.timeline();
 
-  let mainView = document.getElementById("mainView");
-  mainView.style.background = "url(" + imgObject[mainImg] + ")";
+        tl.set(target, {
+            opacity: 1
+        })
+        .to(target, {
+            duration: 1.5,
+            physics2D: {
+                velocity: 'random(100, 400)',
+                angle:'random(360, 0)',
+                gravity: 100
+            },
+            scale: 0,
+            opacity: 0,
+            ease: 'sine'
+        })
+        
+        stl.add(tl, 0);
+    })
+    
+    return stl;
+}
 
-  let leftView = document.getElementById("leftView");
-  leftView.style.background = "url(" + imgObject[prevImg] + ")";
-  
-  let rightView = document.getElementById("rightView");
-  rightView.style.background = "url(" + imgObject[nextImg] + ")";
-  
-  let linkTag = document.getElementById("linkTag")
-  linkTag.href = imgObject[mainImg];
-
-};
-
-function scrollRight() {
-  
-  prevImg = mainImg;
-  mainImg = nextImg;
-  if (nextImg >= (imgObject.length -1)) {
-    nextImg = 0;
-  } else {
-    nextImg++;
-  }; 
-  loadGallery();
-};
-
-function scrollLeft() {
-  nextImg = mainImg
-  mainImg = prevImg;
-   
-  if (prevImg === 0) {
-    prevImg = imgObject.length - 1;
-  } else {
-    prevImg--;
-  };
-  loadGallery();
-};
-
-document.getElementById("navRight").addEventListener("click", scrollRight);
-document.getElementById("navLeft").addEventListener("click", scrollLeft);
-document.getElementById("rightView").addEventListener("click", scrollRight);
-document.getElementById("leftView").addEventListener("click", scrollLeft);
-document.addEventListener('keyup',function(e){
-    if (e.keyCode === 37) {
-    scrollLeft();
-  } else if(e.keyCode === 39) {
-    scrollRight();
-  }
+let roTL = gsap.timeline({
+    defaults: {
+        duration: 1,
+        ease: 'sine.inOut'
+    }
 });
 
-loadGallery();
+let rot = 90;
+
+function addRotAnim() {
+    roTL.to('.hero__cuboid--1', {
+        keyframes: [
+            {
+                x: "-75%",
+                ease: 'power4.inOut'
+            },
+            {
+                rotationY: -rot,
+                delay: -1,
+                ease: 'power4.inOut'
+            }
+        ]
+    })
+    .to('.hero__cuboid--1 .face--front img', {
+        opacity: 0,
+        ease: 'power2.inOut'
+    }, 0)
+    .from('.hero__cuboid--1 .face--right img', {
+        opacity: 0,
+        ease: 'power2.inOut'
+    }, 0.1)
+    .fromTo('.hero__cuboid--1 .face--back img', {
+            opacity: 0
+        },{
+            opacity: 0.2,
+            ease: 'power2.inOut'
+    }, 0)
+    .to('.hero__cuboid--2', {
+        keyframes: [
+            {
+                x: "-25%",
+                ease: 'power4.inOut'
+            },
+            {
+                rotationY: -rot,
+                delay: -1,
+                ease: 'power4.inOut'
+            }
+        ]
+    }, 0)
+    .to('.hero__cuboid--2 .face--front img', {
+        opacity: 0,
+        ease: 'power2.inOut'
+    }, 0)
+    .from('.hero__cuboid--2 .face--right img', {
+        opacity: 0,
+        ease: 'power2.inOut'
+    }, 0.1)
+    .fromTo('.hero__cuboid--2 .face--back img', {
+            opacity: 0
+        },{
+            opacity: 0.2,
+            ease: 'power2.inOut'
+    }, 0.1)
+    .to('.hero__cuboid--3', {
+        keyframes: [
+            {
+                x: "25%",
+                ease: 'power4.inOut'
+            },
+            {
+                rotationY: rot,
+                delay: -1,
+                ease: 'power4.inOut'
+            }
+        ]
+    }, 0)
+    .to('.hero__cuboid--3 .face--front img', {
+        opacity: 0,
+        ease: 'power2.inOut'
+    }, 0)
+    .from('.hero__cuboid--3 .face--left img', {
+        opacity: 0,
+        ease: 'power2.inOut'
+    }, 0.1)
+    .fromTo('.hero__cuboid--3 .face--back img', {
+            opacity: 0
+        },{
+            opacity: 0.2,
+            ease: 'power2.inOut'
+    }, 0.1)
+    .to('.hero__cuboid--4', {
+        keyframes: [
+            {
+                x: "75%",
+                ease: 'power4.inOut'
+            },
+            {
+                rotationY: rot,
+                delay: -1,
+                ease: 'power4.inOut'
+            }
+        ]
+    }, 0)
+    .to('.hero__cuboid--4 .face--front img', {
+        opacity: 0,
+        ease: 'power2.inOut'
+    }, 0)
+    .from('.hero__cuboid--4 .face--left img', {
+        opacity: 0,
+        ease: 'power2.inOut'
+    }, 0.05)
+    .fromTo('.hero__cuboid--4 .face--back img', {
+            opacity: 0
+        },{
+            opacity: 0.2,
+            ease: 'power2.inOut'
+    }, 0.1)
+    .pause();
+}
+
+function initEvents() {
+    gsap.set('.face img', { opacity: 1 });
+    addRotAnim();
+    hero.addEventListener("mouseenter", function( event ) {
+        roTL.play();
+    }, false);
+
+    hero.addEventListener("mouseleave", function( event ) {
+        roTL.reverse();
+    }, false);
+    hero.addEventListener('touchstart', function(event) {
+        if(!tapped){
+            tapped = true;
+            roTL.play();
+        }
+        else {
+            tapped = false;
+            roTL.reverse();
+        }
+        
+    });
+}
 
 
+function init() {
+    gsap.set(stage, { autoAlpha: 1 });
+    gsap.set('.hero__inner', { z: -135 });
+    gltl.add(animInCuboids()).add(animateLogo(), '-=5.3').add(sparkle(), '-=3.85');
+}
 
+function resize() {
+    let vw = window.innerWidth;
+    let hw = hero.offsetWidth;
+    
+    // change the xDistance for the cuboids coming in depending 
+    // on viewport width to avoid overlap on smaller devices
+    if(vw/hw < 1.3) {
+        xDist = "150vw";
+    }
+    else {
+        xDist = "100vw";
+    }
+}
+
+window.onresize = resize;
+
+window.onload = () => {
+    resize();
+	init();
+};
