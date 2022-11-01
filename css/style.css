@@ -1,155 +1,66 @@
-:root {
-  --w: 1080;
-  --h: 777;
-  --gap: 0;
-}
-
-/*  ==========================================================
-	MIXINS
-	========================================================== */
-html {
-  box-sizing: border-box;
-}
-
-*,
-*:before,
-*:after {
-  box-sizing: inherit;
-}
-
-html,
-body {
-  width: 100%;
-  height: 100%;
-}
-
 body {
   display: flex;
-  align-items: center;
-  justify-content: center;
-  background-color: black;
-  color: white;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  overflow: hidden;
-}
-
-.stage {
-  position: relative;
-  display: flex;
+  flex-direction: column;
   justify-content: center;
   align-items: center;
-  margin: auto;
-  width: 100%;
-  height: 100%;
-  visibility: hidden;
-  perspective: 2000px;
+  height: 100vh;
+  background: #f7f7fd;
+  margin: 0;
 }
 
-.hero {
+.swiper {
+  position: absolute;
+  width: 120px;
+  height: 468px;
   cursor: pointer;
 }
 
-.hero,
-.logo__wrap {
+.camera {
+  --d-carousel-item-gap: 5px;
+  --d-carousel-transition: 0.3s;
+  --d-carousel-perspective: 250px;
+  --d-carousel-rotate-x: 0;
+  --d-carousel-translate-z: -100px;
+  --d-carousel-item-width: 45px;
+  --d-carousel-item-height: 45px;
+  --d-carousel-item-gap-double: calc(var(--d-carousel-item-gap) * 2);
+  --camera-width: calc(
+    var(--d-carousel-item-width) + var(--d-carousel-item-gap-double)
+  );
+  --camera-height: calc(
+    var(--d-carousel-item-height) + var(--d-carousel-item-gap-double)
+  );
   position: relative;
-  width: 100%;
-  max-width: 1080px;
-  margin: 30px;
-  transform-style: preserve-3d;
+  width: var(--camera-width);
+  height: var(--camera-height);
+  perspective: var(--d-carousel-perspective);
+  pointer-events: none;
 }
-.hero:before,
-.logo__wrap:before {
-  content: "";
-  display: block;
-  padding-top: calc( var(--h) / var(--w) * 100% );
-}
-
-.hero__inner {
+.camera .d-carousel {
   position: absolute;
-  top: 0;
-  left: 0;
   width: 100%;
   height: 100%;
-  display: flex;
   transform-style: preserve-3d;
+  transform: translateZ(var(--d-carousel-translate-z)) rotateX(var(--d-carousel-rotate-x));
+  transition: var(--d-carousel-transition);
+  pointer-events: none;
 }
-
-.hero__cuboid {
-  position: relative;
-  transform-style: preserve-3d;
-  height: 100%;
-  width: 100%;
-  transform-style: preserve-3d;
-}
-.hero__cuboid .face {
+.camera .d-carousel-item {
+  --d-carousel-item-rotate-x: calc(var(--i) * var(--d-carousel-item-deg));
+  --d-carousel-item-translate-z: var(--d-carousel-item-r);
   position: absolute;
-  left: 0;
-  top: 0;
-  width: 100%;
-  height: 100%;
-  max-width: 100%;
-  max-height: 100%;
-  background-color: black;
-}
-.hero__cuboid .face--front {
-  transform: rotateY(90deg) translateX(-50%) rotateY(-90deg);
-}
-.hero__cuboid .face--back {
-  transform: rotateY(90deg) translateX(50%) rotateY(90deg);
-}
-.hero__cuboid .face--left {
-  transform: translateX(-50%) rotateY(-90deg);
-}
-.hero__cuboid .face--right {
-  transform: translateX(50%) rotateY(90deg);
-}
-.hero__cuboid .face--top {
-  display: none;
-}
-.hero__cuboid .face--bottom {
-  display: none;
-}
-.hero__cuboid .face {
-  transform-style: preserve-3d;
+  left: var(--d-carousel-item-gap);
+  top: var(--d-carousel-item-gap);
+  width: var(--d-carousel-item-width);
+  height: var(--d-carousel-item-height);
+  border-radius: 5px;
   -webkit-backface-visibility: hidden;
           backface-visibility: hidden;
-  overflow: hidden;
-}
-.hero__cuboid .face img {
-  -o-object-fit: cover;
-     object-fit: cover;
-  width: 100%;
-  height: 100%;
-}
-
-.overlay {
-  position: absolute;
-  z_index: 1;
-  width: 100%;
-  height: 100%;
-  content: "";
   pointer-events: none;
-  background-image: linear-gradient(180deg, rgba(0, 0, 0, 0) 50%, #000 80%), radial-gradient(50vh at bottom, black, transparent);
+  transform: rotateX(var(--d-carousel-item-rotate-x)) translateZ(var(--d-carousel-item-translate-z));
 }
 
-.logo__wrap {
+.tip {
   position: absolute;
-  margin: 0;
-  pointer-events: none;
-}
-
-.logo {
-  position: absolute;
-  left: 50%;
-  transform: translate(-50%);
-  bottom: 0px;
-  min-width: 150px;
-  width: 20vw;
-  max-width: 300px;
-}
-
-.spark,
-#glow {
-  mix-blend-mode: screen;
+  top: 4rem;
 }
